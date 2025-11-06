@@ -9,6 +9,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
 
@@ -24,23 +25,35 @@ public class UserDetailsImpl implements UserDetails {
 
     private String email;
 
+    private String username;
+
     private String password;
+
+    private String role;
+
+    private LocalDateTime createdDate;
 
     private Collection<? extends GrantedAuthority> authorities;
 
 
-    public UserDetailsImpl(String id, String email, String password, Collection<? extends GrantedAuthority> authorities) {
+    public UserDetailsImpl(String id, String username, String email, String password, String role, LocalDateTime createdDate, Collection<? extends GrantedAuthority> authorities) {
         this.id = id;
         this.email = email;
         this.password = password;
+        this.role = role;
+        this.createdDate = createdDate;
         this.authorities = authorities;
+        this.username = username;
     }
 
     public static UserDetailsImpl build(User user) {
         return new UserDetailsImpl(
                 user.getId(),
+                user.getUsername(),
                 user.getEmail(),
                 user.getPassword(),
+                user.getRole(),
+                user.getCreatedDate(),
                 List.of(new SimpleGrantedAuthority(user.getRole()))
         );
     }
@@ -57,6 +70,6 @@ public class UserDetailsImpl implements UserDetails {
 
     @Override
     public String getUsername() {
-        return this.email;
+        return this.username;
     }
 }

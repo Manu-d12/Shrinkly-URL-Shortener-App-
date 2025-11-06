@@ -3,6 +3,7 @@ package com.url.shortener.models;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Getter
@@ -23,13 +24,16 @@ public class UrlMapping {
     @Column(name = "short_url", nullable = false)
     private String shortUrl;
 
-    @Column(name = "click_count")
-    private int clickCount = 0;
+    @Column(name = "created_date")
+    private LocalDateTime createdDate;
 
     @ManyToOne(fetch = FetchType.EAGER, optional = false)
     @JoinColumn(name = "user_id")
     private User user;
 
-    @OneToMany(mappedBy = "urlMapping", fetch = FetchType.EAGER)
+    @Column(name = "click_count")
+    private int clickCount;
+
+    @OneToMany(mappedBy = "urlMapping", orphanRemoval = true, cascade = CascadeType.ALL)
     private List<ClickEvent> clickEvents;
 }

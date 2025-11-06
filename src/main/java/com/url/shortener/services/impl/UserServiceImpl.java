@@ -8,6 +8,8 @@ import com.url.shortener.repositories.UserRepo;
 import com.url.shortener.services.UserService;
 import jakarta.transaction.TransactionScoped;
 import org.modelmapper.ModelMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -19,6 +21,9 @@ import java.time.LocalDateTime;
 
 @Service
 public class UserServiceImpl implements UserService {
+
+
+    private Logger logger = LoggerFactory.getLogger(UserService.class);
 
     @Autowired
     private UserRepo userRepo;
@@ -62,8 +67,9 @@ public class UserServiceImpl implements UserService {
 
     @Transactional
     @Override
-    public UserDto findByUsername(String email) {
-       User user = this.userRepo.findByUsername(email).orElseThrow(() -> new ResourceNotFoundException("USER_NOT_FOUND", HttpStatus.NOT_FOUND));
+    public UserDto findByUsername(String username) {
+       logger.info("USER_NAME: {}", username);
+       User user = this.userRepo.findByUsername(username).orElseThrow(() -> new ResourceNotFoundException("USER_NOT_FOUND", HttpStatus.NOT_FOUND));
        return this.modelMapper.map(user, UserDto.class);
     }
 

@@ -7,16 +7,24 @@ import com.url.shortener.exceptions.ResourceNotFoundException;
 import com.url.shortener.security.jwt.JWTService;
 import com.url.shortener.security.jwt.JwtAuthenticationResponse;
 import com.url.shortener.services.UserService;
+import com.url.shortener.services.impl.UserDetailsImpl;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -44,15 +52,23 @@ public class AuthController {
                 new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword())
         );
         if(authentication.isAuthenticated()) {
-            // fetch user from DB and its role and all....
-            // add username as subject in the JwT and roles in the claim...
-            UserDto userDto = this.userService.findByUsername(loginRequest.getUsername());
+            UserDetailsImpl user = (UserDetailsImpl) authentication.getPrincipal();
             Map<String, Object> claims = new HashMap<>();
-            claims.put("ROLE", userDto.getRole());
+            Collection<? extends GrantedAuthority> authorities = (List<? extends GrantedAuthority>) user.getAuthorities();
+            claims.put("roles", authorities.stream()
+                    .map(GrantedAuthority::getAuthority)
+                    .toList());
+
             String token = this.jwtService.generateToken(claims, loginRequest.getUsername());
             JwtAuthenticationResponse jwtAuthenticationResponse = JwtAuthenticationResponse.builder()
                     .token(token)
-                    .user(userDto)
+                    .user(UserDto.builder()
+                            .username(user.getUsername())
+                            .email(user.getEmail())
+                            .id(user.getId())
+                            .role(user.getRole())
+                            .createdDate(user.getCreatedDate())
+                            .build())
                     .build();
             return ResponseEntity.ok(jwtAuthenticationResponse);
         }

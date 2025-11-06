@@ -53,6 +53,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         if(username != null && !this.jwtService.isTokenExpired(token) && SecurityContextHolder.getContext().getAuthentication() == null) {
             // need validate the username......
             UserDetails userDetails = this.userDetailsService.loadUserByUsername(username);
+
+
             UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
                     userDetails,
                     null,

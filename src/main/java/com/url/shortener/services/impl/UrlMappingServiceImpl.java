@@ -94,8 +94,8 @@ public class UrlMappingServiceImpl implements UrlMappingService {
         return grouped.entrySet().stream()
                 .map(entry -> {
                     ClickEventDto dto = new ClickEventDto();
-                    dto.setClickDate(entry.getKey());
-                    dto.setCount(entry.getValue());
+                    dto.setDate(entry.getKey());
+                    dto.setClickCount(entry.getValue());
                     return dto;
                 })
                 .toList();

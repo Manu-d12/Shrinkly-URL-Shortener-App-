@@ -35,6 +35,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
 
         String token = this.jwtService.extractToken(request);
+        logger.info("REQUEST_SOURCE: {}", request.getHeader("Origin"));
+        logger.info("TOKEN: {}",token);
         String username = null;
         try {
             username = this.jwtService.extractUsername(token);

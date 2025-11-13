@@ -14,6 +14,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
@@ -48,10 +49,10 @@ public class AuthController {
 
     @PostMapping("/login")
     public ResponseEntity<JwtAuthenticationResponse> loginUser(@Valid @RequestBody LoginRequest loginRequest) {
-        Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword())
-        );
-        if(authentication.isAuthenticated()) {
+        try {
+            Authentication authentication = authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword())
+            );
             UserDetailsImpl user = (UserDetailsImpl) authentication.getPrincipal();
             Map<String, Object> claims = new HashMap<>();
             Collection<? extends GrantedAuthority> authorities = (List<? extends GrantedAuthority>) user.getAuthorities();
@@ -71,7 +72,9 @@ public class AuthController {
                             .build())
                     .build();
             return ResponseEntity.ok(jwtAuthenticationResponse);
+        } catch (Exception ex) {
+            System.out.println("HERE");
+            throw new ResourceNotFoundException("USER_NOT_FOUND", HttpStatus.NOT_FOUND);
         }
-        throw new ResourceNotFoundException("user not found with given username and password", HttpStatus.NOT_FOUND);
     }
 }

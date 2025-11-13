@@ -6,6 +6,7 @@ import jakarta.servlet.Filter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
@@ -43,6 +44,7 @@ public class WebSecurityConfig {
         httpSecurity.csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> {
                     auth.requestMatchers("/api/auth/**").permitAll()
+                            .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                             .requestMatchers("/api/url/**").authenticated()
                             .requestMatchers("/{shortUrl}").permitAll().
                             anyRequest().authenticated();
@@ -50,6 +52,7 @@ public class WebSecurityConfig {
                 .authenticationProvider(this.authenticationProvider())
                 .sessionManagement(sess -> sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
+
 
        return httpSecurity.build();
     }

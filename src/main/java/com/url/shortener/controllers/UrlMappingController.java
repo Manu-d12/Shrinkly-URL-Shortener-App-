@@ -60,7 +60,7 @@ public class UrlMappingController {
             @RequestParam String startDate,
             @RequestParam String endDate
 
-    ) {
+    ) throws InterruptedException {
         DateTimeFormatter formatter = DateTimeFormatter.ISO_LOCAL_DATE_TIME;
         LocalDateTime start = LocalDateTime.parse(startDate, formatter);
         LocalDateTime end = LocalDateTime.parse(endDate, formatter);
@@ -76,7 +76,7 @@ public class UrlMappingController {
             @RequestParam String startDate,
             @RequestParam String endDate
 
-    ) {
+    ) throws InterruptedException {
         DateTimeFormatter formatter = DateTimeFormatter.ISO_LOCAL_DATE;
         LocalDate start = LocalDate.parse(startDate, formatter);
         LocalDate end = LocalDate.parse(endDate, formatter);
